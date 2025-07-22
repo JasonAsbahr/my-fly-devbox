@@ -15,6 +15,10 @@ primary_region = 'ewr'
 [[services]]
   internal_port = 22
   protocol = "tcp"
+  auto_stop_machines = "suspend"
+  auto_start_machines = true
+  min_machines_running = 0
+  idle_timeout = "1h"
   [[services.ports]]
     port = 2222
 
