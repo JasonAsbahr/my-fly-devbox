@@ -77,10 +77,6 @@ RUN echo '#!/bin/bash' > ~/.setup_persistent.sh && \
     chmod +x ~/.setup_persistent.sh && \
     echo 'source ~/.setup_persistent.sh' >> ~/.bashrc
 
-# Copy setup scripts
-COPY --chown=dev:dev setup-persistent-env.sh /home/dev/setup-persistent-env.sh
-RUN chmod +x /home/dev/setup-persistent-env.sh
-
 # Switch back to root for the entrypoint
 USER root
 
@@ -89,20 +85,8 @@ EXPOSE 22 60000-61000/udp
 
 # Create entrypoint script
 RUN echo '#!/bin/bash' > /entrypoint.sh && \
-    echo '# Start SSH service' >> /entrypoint.sh && \
     echo 'service ssh start' >> /entrypoint.sh && \
-    echo '' >> /entrypoint.sh && \
-    echo '# Run first-time setup if needed' >> /entrypoint.sh && \
-    echo 'if [ ! -f "/data/.first_run_complete" ]; then' >> /entrypoint.sh && \
-    echo '    echo "🎉 First run detected! Setting up persistent environment..."' >> /entrypoint.sh && \
-    echo '    su - dev -c "/home/dev/setup-persistent-env.sh"' >> /entrypoint.sh && \
-    echo '    touch /data/.first_run_complete' >> /entrypoint.sh && \
-    echo 'fi' >> /entrypoint.sh && \
-    echo '' >> /entrypoint.sh && \
-    echo '# Ensure persistent links are in place' >> /entrypoint.sh && \
-    echo 'su - dev -c "source /home/dev/.setup_persistent.sh"' >> /entrypoint.sh && \
-    echo '' >> /entrypoint.sh && \
-    echo '# Keep SSH running' >> /entrypoint.sh && \
+    echo 'su - dev -c "~/.setup_persistent.sh"' >> /entrypoint.sh && \
     echo '/usr/sbin/sshd -D' >> /entrypoint.sh && \
     chmod +x /entrypoint.sh
 

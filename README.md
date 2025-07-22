@@ -40,6 +40,24 @@ Remember to:
 - Set up SSH key authentication
 - Disable password authentication once keys are configured
 
+## GitHub Access
+
+The devbox will automatically generate an SSH key on first run. To enable GitHub access:
+
+1. SSH into your devbox and get the public key:
+   ```bash
+   cat /data/.ssh/id_ed25519.pub
+   ```
+
+2. Add this key to GitHub:
+   - For repository-specific access: Go to the repository → Settings → Deploy keys → Add deploy key
+   - For full account access: Go to GitHub → Settings → SSH and GPG keys → New SSH key
+
+3. Test the connection:
+   ```bash
+   ssh -T git@github.com
+   ```
+
 ## Notes
 
 - Development projects can be cloned into `/data` for persistence
