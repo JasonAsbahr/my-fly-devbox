@@ -1,0 +1,36 @@
+# fly.toml app configuration file generated for my-fly-devbox-jasbahr on 2025-07-22T17:08:02-04:00
+#
+# See https://fly.io/docs/reference/configuration/ for information about how to use this file.
+#
+
+app = 'my-fly-devbox-jasbahr'
+primary_region = 'ewr'
+
+[build]
+
+[mounts]
+  source = "devbox_data"
+  destination = "/data"
+
+[[services]]
+  internal_port = 22
+  protocol = "tcp"
+  [[services.ports]]
+    port = 2222
+
+[[services]]
+  internal_port = 60000
+  protocol = "udp"
+  [[services.ports]]
+    port = 60000
+
+[[services]]
+  internal_port = 61000
+  protocol = "udp"
+  [[services.ports]]
+    port = 61000
+
+[[vm]]
+  memory = '1gb'
+  cpu_kind = 'shared'
+  cpus = 1
