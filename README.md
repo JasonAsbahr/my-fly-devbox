@@ -42,18 +42,35 @@ Remember to:
 
 ## GitHub Access
 
-The devbox will automatically generate an SSH key on first run. To enable GitHub access:
+For security, generate the SSH key locally and copy only the public key to the devbox:
 
-1. SSH into your devbox and get the public key:
+### Automated Setup (Recommended)
+
+Run the setup script from your local machine:
+```bash
+chmod +x setup-github-key.sh
+./setup-github-key.sh
+```
+
+### Manual Setup
+
+1. Generate a key locally:
    ```bash
-   cat /data/.ssh/id_ed25519.pub
+   ssh-keygen -t ed25519 -C "devbox@aeonia.ai" -f ~/.ssh/id_ed25519_devbox
    ```
 
-2. Add this key to GitHub:
-   - For repository-specific access: Go to the repository → Settings → Deploy keys → Add deploy key
-   - For full account access: Go to GitHub → Settings → SSH and GPG keys → New SSH key
+2. Copy keys to devbox:
+   ```bash
+   scp -P 2222 ~/.ssh/id_ed25519_devbox* dev@HOST:/data/.ssh/
+   ssh dev@HOST -p 2222 'cd /data/.ssh && mv id_ed25519_devbox id_ed25519_github'
+   ```
 
-3. Test the connection:
+3. Add the public key to GitHub:
+   - Go to [GitHub SSH Keys](https://github.com/settings/keys)
+   - Click "New SSH key"
+   - Paste the contents of `~/.ssh/id_ed25519_devbox.pub`
+
+4. Test the connection from devbox:
    ```bash
    ssh -T git@github.com
    ```

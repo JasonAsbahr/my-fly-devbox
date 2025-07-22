@@ -70,16 +70,36 @@ fi
 git config --global user.name "Jason Asbahr"
 git config --global user.email "ops@aeonia.ai"
 
-# Generate SSH key for GitHub if not exists
-if [ ! -f "/data/.ssh/id_ed25519" ]; then
-    echo "🔑 Generating SSH key for GitHub..."
-    ssh-keygen -t ed25519 -C "ops@aeonia.ai" -f /data/.ssh/id_ed25519 -N ""
+# Check for GitHub SSH key
+if [ ! -f "/data/.ssh/id_ed25519_github" ]; then
     echo ""
-    echo "📋 Add this SSH key to GitHub as a deploy key or to your account:"
-    echo "────────────────────────────────────────────────────────────────"
-    cat /data/.ssh/id_ed25519.pub
-    echo "────────────────────────────────────────────────────────────────"
+    echo "⚠️  No GitHub SSH key found in /data/.ssh/id_ed25519_github"
     echo ""
+    echo "To set up GitHub access, generate a key locally and copy it:"
+    echo "1. On your local machine:"
+    echo "   ssh-keygen -t ed25519 -C 'devbox@aeonia.ai' -f ~/.ssh/id_ed25519_devbox"
+    echo ""
+    echo "2. Copy the key to this devbox:"
+    echo "   scp -P 2222 ~/.ssh/id_ed25519_devbox* dev@HOST:/data/.ssh/"
+    echo "   ssh dev@HOST -p 2222 'mv /data/.ssh/id_ed25519_devbox /data/.ssh/id_ed25519_github'"
+    echo ""
+    echo "3. Add the public key to GitHub (Settings → SSH keys)"
+    echo ""
+else
+    echo "✅ GitHub SSH key found at /data/.ssh/id_ed25519_github"
+fi
+
+# Set up SSH config for GitHub
+if [ ! -f "/data/.ssh/config" ]; then
+    cat > /data/.ssh/config << 'EOF'
+Host github.com
+    HostName github.com
+    User git
+    IdentityFile /data/.ssh/id_ed25519_github
+    IdentitiesOnly yes
+    StrictHostKeyChecking accept-new
+EOF
+    chmod 600 /data/.ssh/config
 fi
 
 # Create a persistent bashrc additions file
@@ -119,9 +139,9 @@ alias pip='python3.11 -m pip'
 [ -f "$HOME/.local/bin/env" ] && source "$HOME/.local/bin/env"
 
 # SSH Agent setup
-if [ -f /data/.ssh/id_ed25519 ]; then
+if [ -f /data/.ssh/id_ed25519_github ]; then
     eval "$(ssh-agent -s)" > /dev/null 2>&1
-    ssh-add /data/.ssh/id_ed25519 > /dev/null 2>&1
+    ssh-add /data/.ssh/id_ed25519_github > /dev/null 2>&1
 fi
 EOL
 fi
